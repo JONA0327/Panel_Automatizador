@@ -442,6 +442,7 @@ function PackageApp() {
                                                 ))}
                                             </ul>
                                         )}
+
                                         <div className="flex space-x-2 mt-3">
                                             <button
                                                 onClick={() => handleEditPackage(paquete._id || paquete.id)}
@@ -451,6 +452,15 @@ function PackageApp() {
                                                 <FaEdit className="text-sm" />
                                                 <span>Editar</span>
                                             </button>
+
+                                        <button
+                                            onClick={() => handleEditPackage(paquete._id || paquete.id)}
+                                            className="text-blue-500 hover:text-blue-700 hover:bg-blue-100 p-1 rounded-full transition-colors text-sm"
+                                            title="Editar paquete"
+                                        >
+                                            Editar
+                                        </button>
+
 
                                             <button
                                                 onClick={() => handleDeletePackage(paquete._id || paquete.id)}
