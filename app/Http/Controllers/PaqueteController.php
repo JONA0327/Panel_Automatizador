@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Paquete;
 use App\Models\Producto;
+use MongoDB\BSON\ObjectId;
 use Illuminate\Http\Request;
 
 class PaqueteController extends Controller
@@ -19,7 +20,9 @@ class PaqueteController extends Controller
                     ? $paquete->productos
                     : json_decode($paquete->productos, true);
 
-                $paquete->productos_detalle = Producto::whereIn('_id', $ids)->get();
+                $mongoIds = array_map(fn($id) => new ObjectId($id), $ids);
+
+                $paquete->productos_detalle = Producto::whereIn('_id', $mongoIds)->get();
                 return $paquete;
             });
 
@@ -58,7 +61,9 @@ class PaqueteController extends Controller
                 ? $paquete->productos
                 : json_decode($paquete->productos, true);
 
-            $paquete->productos_detalle = Producto::whereIn('_id', $ids)->get();
+            $mongoIds = array_map(fn($id) => new ObjectId($id), $ids);
+
+            $paquete->productos_detalle = Producto::whereIn('_id', $mongoIds)->get();
 
             return response()->json($paquete);
         } catch (\Exception $e) {
