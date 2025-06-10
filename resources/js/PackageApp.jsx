@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { FaPlus, FaSearch, FaShoppingBasket, FaTimes, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaSearch, FaShoppingBasket, FaEdit, FaTrash } from "react-icons/fa";
 
 import Navigation from "./components/Navigation";
 
@@ -425,21 +425,42 @@ function PackageApp() {
                                         <p className="text-sm text-gray-500">
                                             {paquete.descripcion}
                                         </p>
-                                        <button
-                                            onClick={() => handleEditPackage(paquete._id || paquete.id)}
-                                            className="text-blue-500 hover:text-blue-700 hover:bg-blue-100 p-1 rounded-full transition-colors text-sm"
-                                            title="Editar paquete"
-                                        >
-                                            Editar
-                                        </button>
+                                        {Array.isArray(paquete.productos_detalle) && (
+                                            <ul className="mt-2 space-y-1 pl-4 list-disc">
+                                                {paquete.productos_detalle.map((prod) => (
+                                                    <li key={prod._id || prod.id} className="flex items-center space-x-2">
+                                                        {prod.imagenes && prod.imagenes.length > 0 && (
+                                                            <img
+                                                                src={`/storage/${prod.imagenes[0]}`}
+                                                                alt={prod.nombre}
+                                                                className="w-6 h-6 object-cover rounded"
+                                                                onError={(e) => (e.target.style.display = 'none')}
+                                                            />
+                                                        )}
+                                                        <span>{prod.nombre}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                        <div className="flex space-x-2 mt-3">
+                                            <button
+                                                onClick={() => handleEditPackage(paquete._id || paquete.id)}
+                                                className="flex-1 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white py-2 px-3 rounded-lg font-semibold hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-blue-500/25"
+                                                title="Editar paquete"
+                                            >
+                                                <FaEdit className="text-sm" />
+                                                <span>Editar</span>
+                                            </button>
 
-                                        <button
-                                            onClick={() => handleDeletePackage(paquete._id || paquete.id)}
-                                            className="text-red-500 hover:text-red-700 hover:bg-red-100 p-1 rounded-full transition-colors text-sm"
-                                            title="Eliminar paquete"
-                                        >
-                                            <FaTimes />
-                                        </button>
+                                            <button
+                                                onClick={() => handleDeletePackage(paquete._id || paquete.id)}
+                                                className="flex-1 bg-gradient-to-r from-red-500 via-red-600 to-pink-600 text-white py-2 px-3 rounded-lg font-semibold hover:from-red-600 hover:via-red-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-red-500/25"
+                                                title="Eliminar paquete"
+                                            >
+                                                <FaTrash className="text-sm" />
+                                                <span>Eliminar</span>
+                                            </button>
+                                        </div>
 
                                     </div>
                                 ))}
