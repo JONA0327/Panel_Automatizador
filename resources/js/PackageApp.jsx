@@ -425,6 +425,23 @@ function PackageApp() {
                                         <p className="text-sm text-gray-500">
                                             {paquete.descripcion}
                                         </p>
+                                        {Array.isArray(paquete.productos_detalle) && (
+                                            <ul className="mt-2 space-y-1 pl-4 list-disc">
+                                                {paquete.productos_detalle.map((prod) => (
+                                                    <li key={prod._id || prod.id} className="flex items-center space-x-2">
+                                                        {prod.imagenes && prod.imagenes.length > 0 && (
+                                                            <img
+                                                                src={`/storage/${prod.imagenes[0]}`}
+                                                                alt={prod.nombre}
+                                                                className="w-6 h-6 object-cover rounded"
+                                                                onError={(e) => (e.target.style.display = 'none')}
+                                                            />
+                                                        )}
+                                                        <span>{prod.nombre}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
                                         <button
                                             onClick={() => handleEditPackage(paquete._id || paquete.id)}
                                             className="text-blue-500 hover:text-blue-700 hover:bg-blue-100 p-1 rounded-full transition-colors text-sm"

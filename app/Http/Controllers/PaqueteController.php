@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paquete;
+use App\Models\Producto;
 use Illuminate\Http\Request;
 
 class PaqueteController extends Controller
@@ -11,6 +12,17 @@ class PaqueteController extends Controller
     {
         try {
             $paquetes = Paquete::all();
+
+            // Adjuntar la información de los productos a cada paquete
+            $paquetes->transform(function ($paquete) {
+                $ids = is_array($paquete->productos)
+                    ? $paquete->productos
+                    : json_decode($paquete->productos, true);
+
+                $paquete->productos_detalle = Producto::whereIn('_id', $ids)->get();
+                return $paquete;
+            });
+
             return response()->json($paquetes);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al obtener paquetes'], 500);
@@ -41,6 +53,13 @@ class PaqueteController extends Controller
     {
         try {
             $paquete = Paquete::findOrFail($id);
+
+            $ids = is_array($paquete->productos)
+                ? $paquete->productos
+                : json_decode($paquete->productos, true);
+
+            $paquete->productos_detalle = Producto::whereIn('_id', $ids)->get();
+
             return response()->json($paquete);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Paquete no encontrado'], 404);
