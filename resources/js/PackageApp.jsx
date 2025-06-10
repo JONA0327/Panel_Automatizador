@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { FaPlus, FaSearch, FaShoppingBasket, FaTimes, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaSearch, FaShoppingBasket, FaEdit, FaTrash } from "react-icons/fa";
 
 import Navigation from "./components/Navigation";
+import EditPackageModal from "./components/EditPackageModal";
+import DeletePackageModal from "./components/DeletePackageModal";
 
 // Componente para productos seleccionables
 function SelectableProduct({ producto, onSelect }) {
@@ -37,6 +39,7 @@ function SelectableProduct({ producto, onSelect }) {
                 </span>
             </div>
         </div>
+        </>
     );
 }
 
@@ -99,6 +102,8 @@ function PackageApp() {
     const [packageDescription, setPackageDescription] = useState("");
     const [discount, setDiscount] = useState(0);
     const [paquetes, setPaquetes] = useState([]);
+    const [editingPackage, setEditingPackage] = useState(null);
+    const [deletingPackage, setDeletingPackage] = useState(null);
 
     useEffect(() => {
         fetchProductos();
@@ -196,17 +201,38 @@ function PackageApp() {
             setPackageName("");
             setPackageDescription("");
             setDiscount(0);
+            fetchPaquetes();
         } catch (error) {
             alert(error.message);
         }
     };
 
-    const handleEditPackage = async (producto) => {
-        // Logic for editing the package goes here
+    const handleEditPackage = (id) => {
+        const pack = paquetes.find((p) => (p._id || p.id) == id);
+        if (pack) setEditingPackage(pack);
     };
 
-    const handleDeletePackage = async (productId) => {
-        // Logic for deleting the package goes here
+    const handleDeletePackage = (id) => {
+        const pack = paquetes.find((p) => (p._id || p.id) == id);
+        if (pack) setDeletingPackage(pack);
+    };
+
+    const confirmDeletePackage = async () => {
+        if (!deletingPackage) return;
+        try {
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content");
+            const res = await fetch(`/api/paquetes/${deletingPackage._id || deletingPackage.id}`, {
+                method: "DELETE",
+                headers: { 'X-CSRF-TOKEN': csrfToken },
+            });
+            if (!res.ok) throw new Error("Error al eliminar paquete");
+            setDeletingPackage(null);
+            fetchPaquetes();
+        } catch (e) {
+            alert(e.message);
+        }
     };
 
     const filteredProductos = productos.filter((producto) =>
@@ -214,7 +240,23 @@ function PackageApp() {
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <>
+            {editingPackage && (
+                <EditPackageModal
+                    paquete={editingPackage}
+                    productosDisponibles={productos}
+                    onClose={() => setEditingPackage(null)}
+                    onUpdated={fetchPaquetes}
+                />
+            )}
+            {deletingPackage && (
+                <DeletePackageModal
+                    paquete={deletingPackage}
+                    onClose={() => setDeletingPackage(null)}
+                    onConfirm={confirmDeletePackage}
+                />
+            )}
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
             <Navigation />
 
             {/* Hero Section */}
@@ -425,21 +467,45 @@ function PackageApp() {
                                         <p className="text-sm text-gray-500">
                                             {paquete.descripcion}
                                         </p>
-                                        <button
-                                            onClick={() => handleEditPackage(paquete._id || paquete.id)}
-                                            className="text-blue-500 hover:text-blue-700 hover:bg-blue-100 p-1 rounded-full transition-colors text-sm"
-                                            title="Editar paquete"
-                                        >
-                                            Editar
-                                        </button>
+                                        <p className="text-sm text-gray-600">
+                                            Precio: ${paquete.precio_total} {paquete.moneda}
+                                        </p>
+                                        {Array.isArray(paquete.productos_detalle) && (
+                                            <ul className="mt-2 space-y-1 pl-4 list-disc">
+                                                {paquete.productos_detalle.map((prod) => (
+                                                    <li key={prod._id || prod.id} className="flex items-center space-x-2">
+                                                        {prod.imagenes && prod.imagenes.length > 0 && (
+                                                            <img
+                                                                src={`/storage/${prod.imagenes[0]}`}
+                                                                alt={prod.nombre}
+                                                                className="w-6 h-6 object-cover rounded"
+                                                                onError={(e) => (e.target.style.display = 'none')}
+                                                            />
+                                                        )}
+                                                        <span>{prod.nombre}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                        <div className="flex space-x-2 mt-3">
+                                            <button
+                                                onClick={() => handleEditPackage(paquete._id || paquete.id)}
+                                                className="flex-1 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white py-2 px-3 rounded-lg font-semibold hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-blue-500/25"
+                                                title="Editar paquete"
+                                            >
+                                                <FaEdit className="text-sm" />
+                                                <span>Editar</span>
+                                            </button>
 
-                                        <button
-                                            onClick={() => handleDeletePackage(paquete._id || paquete.id)}
-                                            className="text-red-500 hover:text-red-700 hover:bg-red-100 p-1 rounded-full transition-colors text-sm"
-                                            title="Eliminar paquete"
-                                        >
-                                            <FaTimes />
-                                        </button>
+                                            <button
+                                                onClick={() => handleDeletePackage(paquete._id || paquete.id)}
+                                                className="flex-1 bg-gradient-to-r from-red-500 via-red-600 to-pink-600 text-white py-2 px-3 rounded-lg font-semibold hover:from-red-600 hover:via-red-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-red-500/25"
+                                                title="Eliminar paquete"
+                                            >
+                                                <FaTrash className="text-sm" />
+                                                <span>Eliminar</span>
+                                            </button>
+                                        </div>
 
                                     </div>
                                 ))}
@@ -449,6 +515,7 @@ function PackageApp() {
                 </div>
             </div>
         </div>
+        </>
     );
 }
 
