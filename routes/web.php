@@ -8,7 +8,7 @@ Route::get('/productos', function () {
     return view('welcome');
 })->name('productos.view');
 
-
+Route::get('/', function () { return view('welcome'); });
 // Ruta para mostrar la vista de paquetes
 Route::get('/paquetes', function () {
     return view('paquetes');
