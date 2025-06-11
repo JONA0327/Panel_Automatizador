@@ -43,7 +43,6 @@ function SelectableProduct({ producto, onSelect }) {
                 </span>
             </div>
         </div>
-        </>
     );
 }
 
@@ -248,7 +247,8 @@ function PackageApp() {
     );
 
     return (
-        <>
+
+        <div className="flex flex-col min-h-screen">
             {editingPackage && (
                 <EditPackageModal
                     paquete={editingPackage}
@@ -484,11 +484,9 @@ function PackageApp() {
                                                     <li key={prod._id || prod.id} className="flex items-center space-x-2">
                                                         {prod.imagenes && prod.imagenes.length > 0 && (
                                                             <img
-                                                                src={
-                                                                    prod.imagenes[0].startsWith('data:')
-                                                                        ? prod.imagenes[0]
-                                                                        : `/storage/${prod.imagenes[0]}`
-                                                                }
+
+                                                                src={`/storage/${prod.imagenes[0]}`}
+
                                                                 alt={prod.nombre}
                                                                 className="w-6 h-6 object-cover rounded"
                                                                 onError={(e) => (e.target.style.display = 'none')}
@@ -498,16 +496,21 @@ function PackageApp() {
                                                     </li>
                                                 ))}
                                             </ul>
-                                        )}
-                                        <div className="flex space-x-2 mt-3">
-                                            <button
-                                                onClick={() => handleEditPackage(paquete._id || paquete.id)}
+
+
+                                          )}
+
+                                          <div className="flex space-x-2 mt-3">
+                                              <button
+                                                  onClick={() => handleEditPackage(paquete._id || paquete.id)}
+
                                                 className="flex-1 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white py-2 px-3 rounded-lg font-semibold hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-blue-500/25"
                                                 title="Editar paquete"
                                             >
                                                 <FaEdit className="text-sm" />
                                                 <span>Editar</span>
                                             </button>
+
 
                                             <button
                                                 onClick={() => handleDeletePackage(paquete._id || paquete.id)}
@@ -524,14 +527,14 @@ function PackageApp() {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        </>
-    );
-}
 
-// Mount the component
+                  </div>
+              </div>
+           </div>
+      </div>
+      );
+  }
+
 const container = document.getElementById("app");
 const root = createRoot(container);
 root.render(<PackageApp />);

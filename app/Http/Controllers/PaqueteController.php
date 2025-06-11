@@ -20,9 +20,13 @@ class PaqueteController extends Controller
                     ? $paquete->productos
                     : json_decode($paquete->productos, true);
 
+
                 $mongoIds = array_map(fn($id) => new ObjectId($id), $ids);
 
                 $paquete->productos_detalle = Producto::whereIn('_id', $mongoIds)->get();
+
+                $paquete->productos_detalle = Producto::whereIn('_id', $ids)->get();
+
                 return $paquete;
             });
 
@@ -60,6 +64,7 @@ class PaqueteController extends Controller
             $ids = is_array($paquete->productos)
                 ? $paquete->productos
                 : json_decode($paquete->productos, true);
+
 
             $mongoIds = array_map(fn($id) => new ObjectId($id), $ids);
 
