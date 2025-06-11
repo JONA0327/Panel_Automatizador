@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Producto;
-use Illuminate\Support\Facades\Storage; // Para guardar archivos
 
 class ProductoController extends Controller
 {
@@ -32,14 +31,15 @@ class ProductoController extends Controller
             'imagenes.*'  => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        $rutas = [];
+        $imagenes = [];
         if ($request->hasFile('imagenes')) {
             foreach ($request->file('imagenes') as $img) {
-                $ruta = $img->store('productos', 'public');
-                $rutas[] = $ruta;
+                $mime = $img->getClientMimeType();
+                $base64 = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($img->getRealPath()));
+                $imagenes[] = $base64;
             }
         }
-        $validated['imagenes'] = $rutas;
+        $validated['imagenes'] = $imagenes;
 
         $producto = Producto::create($validated);
 
@@ -94,15 +94,16 @@ class ProductoController extends Controller
             return redirect()->route('productos.index')->withErrors('Producto no encontrado');
         }
 
-        // Procesar las nuevas imágenes (si las hay) y concatenar con las anteriores si así lo deseas
-        $rutasImagenes = $producto->imagenes ?? []; // Array de rutas existentes
+        // Procesar las nuevas imágenes (si las hay) y concatenar con las anteriores
+        $imagenesActuales = $producto->imagenes ?? [];
         if ($request->hasFile('imagenes')) {
             foreach ($request->file('imagenes') as $imagen) {
-                $ruta = $imagen->store('productos', 'public');
-                $rutasImagenes[] = $ruta;
+                $mime = $imagen->getClientMimeType();
+                $base64 = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($imagen->getRealPath()));
+                $imagenesActuales[] = $base64;
             }
         }
-        $validatedData['imagenes'] = $rutasImagenes;
+        $validatedData['imagenes'] = $imagenesActuales;
 
         $producto->fill($validatedData);
         $producto->save();
@@ -115,13 +116,10 @@ class ProductoController extends Controller
     {
         $producto = Producto::find($id);
         if ($producto) {
-            // Si deseas borrar imágenes del storage, hazlo aquí antes de eliminar el documento.
-            foreach ($producto->imagenes as $ruta) {
-                Storage::disk('public')->delete($ruta);
-            }
+            // Almacenar las imágenes en la base, por lo que no hay archivos que eliminar
             $producto->delete();
         }
-       return response()->json(['message' => 'Producto eliminado correctamente.']);
+        return response()->json(['message' => 'Producto eliminado correctamente.']);
     }
 
 

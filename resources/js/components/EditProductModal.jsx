@@ -199,7 +199,7 @@ function EditProductModal({ producto, onClose, onProductoEditado }) {
                 {producto.imagenes.map((img, idx) => (
                   <img
                     key={idx}
-                    src={`/storage/${img}`}
+                    src={img.startsWith('data:') ? img : `/storage/${img}`}
                     alt={`Imagen actual ${idx + 1}`}
                     className="w-24 h-24 object-cover rounded-xl border shadow"
                   />

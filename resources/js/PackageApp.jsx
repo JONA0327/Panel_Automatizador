@@ -18,7 +18,11 @@ function SelectableProduct({ producto, onSelect }) {
                 <div className="flex items-center space-x-3">
                     {producto.imagenes && producto.imagenes.length > 0 ? (
                         <img
-                            src={`/storage/${producto.imagenes[0]}`}
+                            src={
+                                producto.imagenes[0].startsWith('data:')
+                                    ? producto.imagenes[0]
+                                    : `/storage/${producto.imagenes[0]}`
+                            }
                             alt={producto.nombre}
                             className="w-10 h-10 object-cover rounded-lg"
                             onError={(e) => {
@@ -39,7 +43,6 @@ function SelectableProduct({ producto, onSelect }) {
                 </span>
             </div>
         </div>
-
     );
 }
 
@@ -50,7 +53,11 @@ function PackageProduct({ producto, onRemove, onEdit }) {
             <div className="flex items-center space-x-3">
                 {producto.imagenes && producto.imagenes.length > 0 ? (
                     <img
-                        src={`/storage/${producto.imagenes[0]}`}
+                        src={
+                            producto.imagenes[0].startsWith('data:')
+                                ? producto.imagenes[0]
+                                : `/storage/${producto.imagenes[0]}`
+                        }
                         alt={producto.nombre}
                         className="w-12 h-12 object-cover rounded-lg"
                         onError={(e) => {
@@ -242,7 +249,6 @@ function PackageApp() {
     return (
 
         <div className="flex flex-col min-h-screen">
-
             {editingPackage && (
                 <EditPackageModal
                     paquete={editingPackage}
@@ -478,7 +484,9 @@ function PackageApp() {
                                                     <li key={prod._id || prod.id} className="flex items-center space-x-2">
                                                         {prod.imagenes && prod.imagenes.length > 0 && (
                                                             <img
+
                                                                 src={`/storage/${prod.imagenes[0]}`}
+
                                                                 alt={prod.nombre}
                                                                 className="w-6 h-6 object-cover rounded"
                                                                 onError={(e) => (e.target.style.display = 'none')}
@@ -488,6 +496,7 @@ function PackageApp() {
                                                     </li>
                                                 ))}
                                             </ul>
+
 
                                           )}
 

@@ -198,7 +198,9 @@ function DiseaseApp() {
                           <li key={d.producto_id} className="text-sm flex items-center space-x-2">
                             {prod && prod.imagenes && prod.imagenes[0] && (
                               <img
+
                                 src={`/storage/${prod.imagenes[0]}`}
+
                                 alt={prod.nombre}
                                 className="w-5 h-5 object-cover rounded"
                                 onError={(e) => (e.target.style.display = 'none')}
