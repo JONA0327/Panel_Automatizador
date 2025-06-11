@@ -43,7 +43,11 @@ function ProductCard({ producto, onEdit, onDelete, index }) {
         {producto.imagenes && producto.imagenes.length > 0 ? (
           <>
             <img
-              src={`/storage/${producto.imagenes[0]}`}
+              src={
+                producto.imagenes[0].startsWith('data:')
+                  ? producto.imagenes[0]
+                  : `/storage/${producto.imagenes[0]}`
+              }
               alt={`Imagen de ${producto.nombre}`}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
